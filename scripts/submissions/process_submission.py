@@ -1872,6 +1872,11 @@ def _facet_links(values: list[str], facet: str) -> str:
     )
 
 
+def _table_cell_text(value: str) -> str:
+    """User text for a Markdown table cell."""
+    return "<br>".join(line.strip() for line in value.splitlines()).replace("|", r"\|")
+
+
 def _run_footer(run_url: str) -> str:
     """Small-print footer shared by the PR body and issue comments."""
     return f"<sub>View the [site submission workflow logs]({run_url}).</sub>"
@@ -1936,6 +1941,7 @@ def build_pr_body(
         "|---|---|",
         f"| Site | <{p.site_url}> |",
         f"| Developer | {_profile_line(p)} |",
+        f"| Description | {_table_cell_text(p.site_description)} |",
     ]
     if p.similar_developers:
         links = ", ".join(

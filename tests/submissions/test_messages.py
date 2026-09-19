@@ -72,6 +72,22 @@ class TestPrBody:
             "| Capabilities | [multilingual](https://madewithwagtail.org/sites/capability/multilingual/) |"
             in body
         )
+        assert "| Description | A site. |" in body
+
+    def test_description_table_cell_escapes_markdown_table_breaks(self):
+        body = ps.build_pr_body(
+            make_proposal(
+                site_description="A research site for readers | editors.\nBuilt with care."
+            ),
+            DETECTION,
+            "wagtail/madewithwagtail",
+            "submission/issue-42",
+            "https://run",
+        )
+        assert (
+            "| Description | A research site for readers \\| editors.<br>Built with care. |"
+            in body
+        )
 
     def test_similar_profiles_row_when_hinted(self):
         # Near-miss developer names create a new profile; similar existing
