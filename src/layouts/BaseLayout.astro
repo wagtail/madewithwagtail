@@ -243,7 +243,11 @@ function navIsActive(path: string): boolean {
                 >
               </li>
               <li class="nav__item">
-                <a href={withBase('/search/')} class="nav__link">Search</a>
+                <a
+                  href={withBase('/search/')}
+                  class:list={['nav__link', { 'is-active': navIsActive('/search/') }]}
+                  >Search</a
+                >
               </li>
               <li class="nav__item">
                 <a
