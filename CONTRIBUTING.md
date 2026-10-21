@@ -10,12 +10,14 @@ Requirements: Node, `npm`, [`just`](https://github.com/casey/just), and [`prek`]
 git clone git+https://github.com/wagtail/madewithwagtail
 cd madewithwagtail
 
-# Install the dependencies.
+# Install the dependencies and Git hooks.
 just install
 
 # Start the development server at http://localhost:4321/madewithwagtail/.
 just serve
 ```
+
+`just install` installs dependencies and sets up the Git pre-commit hooks without formatting project files. Run `just format` when you want to apply formatting.
 
 Other useful commands:
 
@@ -53,7 +55,7 @@ just build   # Build the production site to `dist/`.
 just check   # Run the Astro type checker.
 just format  # Run all formatters.
 just help    # List all the justfile recipes.
-just install # Install the dependencies.
+just install # Install the dependencies and Git hooks.
 just lint    # Run all linters.
 just serve   # Run the development server at localhost:4321.
 ```
