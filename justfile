@@ -5,12 +5,10 @@
 help:
     just --list --list-prefix 'just '
 
-# Install the dependencies.
+# Install the dependencies and Git hooks.
 install:
     npm ci
-    npx biome check --write .
-    npm run format:css
-    prek run --all-files
+    prek install
 
 # Lint the code with Biome, Stylelint, and prek.
 lint:
