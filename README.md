@@ -1,4 +1,4 @@
-[Made with Wagtail](https://madewithwagtail.org) [<img src="https://raw.githubusercontent.com/wagtail/wagtail/main/docs/logo.png" width="83" align="right" alt="Wagtail">](https://wagtail.org/)
+# [Made with Wagtail](https://madewithwagtail.org)
 
 > A showcase of sites and apps made with [Wagtail](https://wagtail.org/): an easy to use, open source content management system.
 
