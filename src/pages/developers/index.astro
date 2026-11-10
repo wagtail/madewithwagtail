@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import DeveloperCard from '../../components/DeveloperCard.astro';
-import Icon from '../../components/Icon.astro';
+import Pagination from '../../components/Pagination.astro';
 import { absoluteUrl, withBase } from '../../helpers.ts';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { collectionPageNode } from '../../schema.ts';
@@ -70,27 +70,20 @@ const jsonLd = [
     </div>
 
     {totalPages > 1 && (
-      <ul class="pagination">
-        <li class="pagination__item">
-          <span class="pagination__inactive">
-            <Icon name="arrow-left" class="pagination__arrow" />
-          </span>
-        </li>
-        {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map((n) => (
-          <li class="pagination__item">
-            {n === 1 ? (
-              <span class="pagination__current">1</span>
-            ) : (
-              <a href={withBase(`/developers/page/${n}`)} class="pagination__link">{n}</a>
-            )}
-          </li>
-        ))}
-        <li class="pagination__item">
-          <a href={withBase('/developers/page/2')} class="pagination__link">
-            <Icon name="arrow-right" class="pagination__arrow" />
-          </a>
-        </li>
-      </ul>
+      <Pagination
+        page={{
+          currentPage: 1,
+          lastPage: totalPages,
+          total: sortedDevelopers.length,
+          url: {
+            current: withBase('/developers/'),
+            prev: undefined,
+            next: withBase('/developers/page/2'),
+            first: undefined,
+            last: withBase(`/developers/page/${totalPages}`),
+          },
+        }}
+      />
     )}
   </div>
 </BaseLayout>
