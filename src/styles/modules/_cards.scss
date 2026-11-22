@@ -85,3 +85,16 @@
   color: $color-light-text;
   font-size: rem(14);
 }
+// Improve screenshot visibility on smaller screens
+@include small() {
+  .project-image {
+    padding-bottom: 75%;
+  }
+}
+
+// Keep project links visible on touch devices
+@media (hover: none) {
+  .project__links {
+    opacity: 1;
+  }
+}
