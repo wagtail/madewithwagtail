@@ -11,7 +11,13 @@ from pipeline.content import (
     update_developer_profile,
     write_content_files,
 )
-from pipeline.publish import commit_message, git_add_paths
+from pipeline.publish import (
+    PR_CREATED_LABEL,
+    WAGTAIL_DETECTED_LABEL,
+    commit_message,
+    git_add_paths,
+    pr_labels,
+)
 from process_submission import cmd_publish
 from test_proposal import make_proposal_kwargs
 
@@ -200,6 +206,20 @@ class TestCommitMessage:
     def test_missing_id_omits_trailer(self):
         message = commit_message(make_proposal(), "thibaudcolas", None)
         assert "Co-authored-by" not in message
+
+
+class TestPrLabels:
+    def test_wagtail_detected_gets_both_labels(self):
+        assert pr_labels({"is_wagtail": True, "signals": ["wagtail-app"]}) == [
+            PR_CREATED_LABEL,
+            WAGTAIL_DETECTED_LABEL,
+        ]
+
+    def test_no_detection_gets_only_pr_created(self):
+        assert pr_labels({"is_wagtail": False, "signals": []}) == [PR_CREATED_LABEL]
+
+    def test_missing_verdict_gets_only_pr_created(self):
+        assert pr_labels({}) == [PR_CREATED_LABEL]
 
 
 class TestCmdPublishPrepare:

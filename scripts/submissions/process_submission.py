@@ -51,11 +51,11 @@ from pipeline.proposal import Proposal, Rejection, build_proposal
 from pipeline.publish import (
     BRANCH_PREFIX,
     PR_CREATED_LABEL,
-    PR_LABEL,
     build_pr_body,
     build_pr_comment,
     commit_message,
     git_add_paths,
+    pr_labels,
     run,
 )
 
@@ -284,8 +284,12 @@ def cmd_publish(argv: list[str]) -> int:
     )
     body_file.write_text(body, encoding="utf-8")
 
-    # The PR label may not exist yet in the repository.
-    run(["gh", "label", "create", PR_LABEL, "--color", "1d76db", "--force"])
+    # The labels may not exist yet in the repository. Auto-created PRs carry
+    # the same `submission → PR created` label as the issue they come from,
+    # plus a Wagtail-detected label when the detection verdict is positive.
+    labels = pr_labels(detection)
+    for label in labels:
+        run(["gh", "label", "create", label, "--color", "0e8a16", "--force"])
     # A retried submission (issue reopened) may already have an open PR for
     # the branch; update it in place instead of failing.
     result = subprocess.run(
@@ -298,6 +302,7 @@ def cmd_publish(argv: list[str]) -> int:
     if existing:
         pr_url = existing[0]["url"]
         run(["gh", "pr", "edit", pr_url, "--body-file", str(body_file)])
+        run(["gh", "pr", "edit", pr_url, *[f"--add-label={label}" for label in labels]])
     else:
         # gh pr create prints the PR URL on stdout — capture it for the issue comment.
         result = subprocess.run(
@@ -311,8 +316,7 @@ def cmd_publish(argv: list[str]) -> int:
                 str(body_file),
                 "--head",
                 branch,
-                "--label",
-                PR_LABEL,
+                *[f"--label={label}" for label in labels],
             ],
             check=True,
             capture_output=True,
@@ -333,7 +337,6 @@ def cmd_publish(argv: list[str]) -> int:
             "--create-if-none",
         ]
     )
-    run(["gh", "label", "create", PR_CREATED_LABEL, "--color", "0e8a16", "--force"])
     run(
         [
             "gh",

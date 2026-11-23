@@ -15,9 +15,9 @@ if TYPE_CHECKING:
     from .proposal import Proposal
 
 
-PR_LABEL = "🤖 new site submission"
 NEEDS_TRIAGE_LABEL = "needs-triage"
 PR_CREATED_LABEL = "submission → PR created"
+WAGTAIL_DETECTED_LABEL = "🤖 detected Wagtail"
 LIVE_SITE_URL = "https://madewithwagtail.org"
 
 # Submitted text is shown as literal text in the summary table: submissions
@@ -248,6 +248,19 @@ def _detected_technologies_section(detection: dict) -> list[str]:
         lines.append("- Other: " + ", ".join(other))
     lines.append("")
     return lines
+
+
+def pr_labels(detection: dict) -> list[str]:
+    """Labels for an auto-created PR.
+
+    Every PR carries the same `submission → PR created` label as its issue;
+    PRs whose submission definitely detected Wagtail (the pure HTML detection
+    verdict, never the Wappalyzer scan) also get the detected-Wagtail label.
+    """
+    labels = [PR_CREATED_LABEL]
+    if detection.get("is_wagtail"):
+        labels.append(WAGTAIL_DETECTED_LABEL)
+    return labels
 
 
 def git_add_paths(p: Proposal, repo_root: Path) -> list[Path]:
