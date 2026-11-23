@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import subprocess
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -19,6 +20,45 @@ NEEDS_TRIAGE_LABEL = "needs-triage"
 PR_CREATED_LABEL = "submission → PR created"
 LIVE_SITE_URL = "https://madewithwagtail.org"
 
+# Submitted text is shown as literal text in the summary table: submissions
+# are public, so Markdown in a description could otherwise inject links,
+# @mentions, or cross-references into a bot-authored PR body.
+_TABLE_CELL_ESCAPES = str.maketrans(
+    {
+        "\\": r"\\",
+        "|": r"\|",
+        "*": r"\*",
+        "_": r"\_",
+        "[": r"\[",
+        "]": r"\]",
+        "(": r"\(",
+        ")": r"\)",
+        "#": r"\#",
+        "@": r"\@",
+        "~": r"\~",
+        "`": r"\`",
+        "<": "&lt;",
+        ">": "&gt;",
+        "&": "&amp;",
+    }
+)
+
+
+def _table_cell_text(value: str) -> str:
+    """Submitted text as a literal Markdown table cell.
+
+    Escapes the cell separator and inline markup, so the text renders as
+    written rather than as a link, mention, or reference. HTML angle
+    brackets become entities: GitHub sanitises them anyway, but the cell
+    then still shows markup that will reach the site's raw Markdown.
+    """
+    paragraphs = [
+        " ".join(line.strip() for line in block.splitlines() if line.strip())
+        .translate(_TABLE_CELL_ESCAPES)
+        for block in re.split(r"\n\s*\n", value.strip())
+    ]
+    return "<br><br>".join(p for p in paragraphs if p)
+
 
 def _profile_line(p: Proposal) -> str:
     """Developer table cell: name linked to their website, profile link after.
@@ -27,12 +67,13 @@ def _profile_line(p: Proposal) -> str:
     new and existing profiles; the profile-page link only exists once the
     profile is live.
     """
+    name_text = _table_cell_text(p.developer_name)
     if p.developer_url:
-        name = f"[{p.developer_name}]({p.developer_url})"
+        name = f"[{name_text}]({p.developer_url})"
     elif p.developer_exists:
-        name = f"[{p.developer_name}]({LIVE_SITE_URL}/developers/{p.developer_slug}/)"
+        name = f"[{name_text}]({LIVE_SITE_URL}/developers/{p.developer_slug}/)"
     else:
-        name = p.developer_name
+        name = name_text
     if p.developer_exists:
         suffix = (
             f" - [see profile page]({LIVE_SITE_URL}/developers/{p.developer_slug}/)"
@@ -116,6 +157,7 @@ def build_pr_body(
         "|---|---|",
         f"| Site | <{p.site_url}> |",
         f"| Developer | {_profile_line(p)} |",
+        f"| Description | {_table_cell_text(p.site_description)} |",
     ]
     if p.similar_developers:
         links = ", ".join(

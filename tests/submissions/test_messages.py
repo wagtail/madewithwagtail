@@ -78,6 +78,68 @@ class TestPrBody:
             "| Capabilities | [multilingual](https://madewithwagtail.org/sites/capability/multilingual/) |"
             in body
         )
+        assert "| Description | A site. |" in body
+
+    def test_description_table_cell_escapes_markdown_table_breaks(self):
+        body = build_pr_body(
+            make_proposal(
+                site_description="A research site for readers | editors.\n"
+                "Built with care."
+            ),
+            DETECTION,
+            "wagtail/madewithwagtail",
+            "submission/issue-42",
+            "https://run",
+        )
+        # Soft line breaks collapse on the live site, so the cell does too.
+        assert (
+            "| Description | A research site for readers \\| editors. Built with care. |"
+            in body
+        )
+
+    def test_description_table_cell_keeps_a_landed_backslash_escaped(self):
+        body = build_pr_body(
+            make_proposal(site_description="Backslash before a pipe \\| like this."),
+            DETECTION,
+            "wagtail/madewithwagtail",
+            "submission/issue-42",
+            "https://run",
+        )
+        assert (
+            "| Description | Backslash before a pipe \\\\\\| like this. |" in body
+        )
+
+    def test_description_table_cell_renders_markdown_as_literal_text(self):
+        # A public submission must not be able to inject links, mentions, or
+        # HTML into a bot-authored PR body.
+        description = (
+            "@thibaudcolas [approve](https://example.com) #123 "
+            "<script>alert(1)</script> **bold**"
+        )
+        body = build_pr_body(
+            make_proposal(site_description=description),
+            DETECTION,
+            "wagtail/madewithwagtail",
+            "submission/issue-42",
+            "https://run",
+        )
+        assert (
+            "| Description | \\@thibaudcolas \\[approve\\]\\(https://example.com\\) "
+            "\\#123 &lt;script&gt;alert\\(1\\)&lt;/script&gt; \\*\\*bold\\*\\* |"
+            in body
+        )
+
+    def test_description_paragraphs_become_br_breaks(self):
+        body = build_pr_body(
+            make_proposal(site_description="First paragraph.\n\nSecond paragraph."),
+            DETECTION,
+            "wagtail/madewithwagtail",
+            "submission/issue-42",
+            "https://run",
+        )
+        assert (
+            "| Description | First paragraph.<br><br>Second paragraph. |" in body
+        )
 
     def test_similar_profiles_row_when_hinted(self):
         # Near-miss developer names create a new profile; similar existing
