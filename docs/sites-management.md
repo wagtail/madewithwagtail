@@ -12,7 +12,7 @@ Submit new sites and new developer profiles through the [site submission form](h
 
 Nothing is published automatically: a maintainer reviews and merges the pull request, which closes the original issue. The pipeline's logic lives in `scripts/submissions/pipeline/`, wired up by the `process_submission.py` and `refresh_sites.py` entry scripts.
 
-The process is automated so we consistently detect technologies the site is built with and take high-quality screenshots. Site submissions are auto-rejected if the site isn’t built with Wagtail, or for other issues with the submissions. Rejected submissions stay open, labelled `needs-triage` for a maintainer to follow up on.
+The process is automated so we consistently detect technologies the site is built with and take high-quality screenshots. Site submissions are auto-rejected if the site isn’t built with Wagtail, or for other issues with the submissions. Rejected submissions stay open, labelled `needs triage` for a maintainer to follow up on.
 
 ## Periodic refresh
 

@@ -80,11 +80,11 @@ jobs:
             echo
             echo "$reasons"
             echo
-            echo "A maintainer will follow up (the issue is labelled needs-triage). Feel free to update the submission details here in the meantime."
+            echo "A maintainer will follow up (the issue is labelled \"needs triage\"). Feel free to update the submission details here in the meantime."
           } > rejection-comment.md
           gh issue comment "$ISSUE_NUMBER" --body-file rejection-comment.md --edit-last --create-if-none
-          gh label create "needs-triage" --color e99695 --force
-          gh issue edit "$ISSUE_NUMBER" --add-label "needs-triage"
+          gh label create "needs triage" --color e99695 --force
+          gh issue edit "$ISSUE_NUMBER" --add-label "needs triage"
       - name: Handle unexpected error
         # A crashed validation is our bug, not the submitter's: tell them a
         # maintainer will follow up and leave the issue open for triage.
@@ -101,8 +101,8 @@ jobs:
             echo "Check the [job log]($GITHUB_JOB_URL) for details — a maintainer will follow up."
           } > error-comment.md
           gh issue comment "$ISSUE_NUMBER" --body-file error-comment.md --edit-last --create-if-none
-          gh label create "needs-triage" --color e99695 --force
-          gh issue edit "$ISSUE_NUMBER" --add-label "needs-triage"
+          gh label create "needs triage" --color e99695 --force
+          gh issue edit "$ISSUE_NUMBER" --add-label "needs triage"
           # Mark the run red now that the issue is labelled: the pipeline
           # must be fixed and the submission re-run, not resubmitted.
           exit 1
@@ -179,11 +179,11 @@ jobs:
             echo "- Our scan detected incompatible technologies (${incompatible});"
             echo "  the showcase only lists sites built with Wagtail."
             echo
-            echo "A maintainer will follow up (the issue is labelled needs-triage)."
+            echo "A maintainer will follow up (the issue is labelled \"needs triage\")."
           } > rejection-comment.md
           gh issue comment "$ISSUE_NUMBER" --body-file rejection-comment.md --edit-last --create-if-none
-          gh label create "needs-triage" --color e99695 --force
-          gh issue edit "$ISSUE_NUMBER" --add-label "needs-triage"
+          gh label create "needs triage" --color e99695 --force
+          gh issue edit "$ISSUE_NUMBER" --add-label "needs triage"
           # Mark the run red: no PR must be opened for an incompatible site.
           exit 1
 
@@ -203,8 +203,8 @@ jobs:
           gh issue comment "$ISSUE_NUMBER" \
             --body "The submission pipeline failed at the **render** stage — the site couldn't be reached or screenshotted. Check the [workflow run]($GITHUB_RUN_URL) for details — a maintainer will follow up." \
             --edit-last --create-if-none
-          gh label create "needs-triage" --color e99695 --force
-          gh issue edit "$ISSUE_NUMBER" --add-label "needs-triage"
+          gh label create "needs triage" --color e99695 --force
+          gh issue edit "$ISSUE_NUMBER" --add-label "needs triage"
 
   publish:
     needs: [render, reject-technologies]
@@ -279,5 +279,5 @@ jobs:
           gh issue comment "$ISSUE_NUMBER" \
             --body "The submission pipeline failed at the **publish** stage. Check the [workflow run]($GITHUB_RUN_URL) for details — a maintainer will follow up." \
             --edit-last --create-if-none
-          gh label create "needs-triage" --color e99695 --force
-          gh issue edit "$ISSUE_NUMBER" --add-label "needs-triage"
+          gh label create "needs triage" --color e99695 --force
+          gh issue edit "$ISSUE_NUMBER" --add-label "needs triage"
