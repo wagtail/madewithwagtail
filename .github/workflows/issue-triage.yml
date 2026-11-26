@@ -1,12 +1,9 @@
-name: Triage new issues
+name: Issue triage
 
 on:
   issues:
     types: [opened]
 
-# Workflow-level default: the triage job below is the only one needing write
-# access, so it requests it explicitly. This workflow runs on issues opened by
-# anyone (including first-time contributors), so keep permissions minimal.
 permissions:
   contents: read
 
@@ -15,22 +12,17 @@ env:
 
 jobs:
   triage:
-    # Site submissions are handled by submission.yml. They're detected by the
-    # submission form's rendered headings, matching the same check there, so
-    # they get the processing pipeline rather than the triage comment.
+    # Skip site submissions.
     if: contains(github.event.issue.body, '### Site URL') == false
     runs-on: ubuntu-26.04-arm
     timeout-minutes: 5
     permissions:
-      issues: write # label + comment
+      # Label + comment.
+      issues: write
     env:
       GH_TOKEN: ${{ github.token }}
-      # Show the label with its natural spacing in the UI; GitHub treats
-      # spaces and hyphens in label names as distinct characters.
       TRIAGE_LABEL: needs triage
-      # The job never checks out the repository, so `gh` has no git remote to
-      # infer the target from and fails with "not a git repository". Passing
-      # --repo explicitly avoids the checkout and its credentials entirely.
+      # Make sure `gh` works without a repo checkout.
       GH_REPO: ${{ github.repository }}
     steps:
       - name: Label issue and comment
@@ -42,6 +34,5 @@ jobs:
             echo
             echo "This is marked as **\"needs triage\"**, pending guidance/feedback from project maintainers and other contributors. Maintainers will edit this comment’s text once this is ready to proceed. Until then, any pull requests may be closed without further review."
           } > triage-comment.md
-          gh label create "$TRIAGE_LABEL" --color e99695 --force
           gh issue edit "$ISSUE_NUMBER" --add-label "$TRIAGE_LABEL"
           gh issue comment "$ISSUE_NUMBER" --body-file triage-comment.md
