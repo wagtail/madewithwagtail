@@ -28,6 +28,10 @@ jobs:
       # Show the label with its natural spacing in the UI; GitHub treats
       # spaces and hyphens in label names as distinct characters.
       TRIAGE_LABEL: needs triage
+      # The job never checks out the repository, so `gh` has no git remote to
+      # infer the target from and fails with "not a git repository". Passing
+      # --repo explicitly avoids the checkout and its credentials entirely.
+      GH_REPO: ${{ github.repository }}
     steps:
       - name: Label issue and comment
         run: |
