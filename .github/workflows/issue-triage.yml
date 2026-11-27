@@ -25,14 +25,11 @@ jobs:
       # Make sure `gh` works without a repo checkout.
       GH_REPO: ${{ github.repository }}
     steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/triage-comment.md
       - name: Label issue and comment
         run: |
-          {
-            echo "Thank you for opening this. Make sure to check the project’s [contribution guidelines](https://github.com/wagtail/madewithwagtail/blob/main/CONTRIBUTING.md)."
-            echo
-            echo "### Working on this"
-            echo
-            echo "This is marked as **\"needs triage\"**, pending guidance/feedback from project maintainers and other contributors. Maintainers will edit this comment’s text once this is ready to proceed. Until then, any pull requests may be closed without further review."
-          } > triage-comment.md
           gh issue edit "$ISSUE_NUMBER" --add-label "$TRIAGE_LABEL"
-          gh issue comment "$ISSUE_NUMBER" --body-file triage-comment.md
+          gh issue comment "$ISSUE_NUMBER" --body-file .github/triage-comment.md
